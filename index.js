@@ -8,7 +8,7 @@ app.use(fileUpload());
 
 app.post("/upload", async (req, res) => {
   if(!req.files){
-    res.status(500).send({ error: 'Something failed!' });
+    res.status(500).send({ error: 'Reconhcimento facial falhou, tente novamente!' });
   }
   const { file,file2 } = req.files;
 

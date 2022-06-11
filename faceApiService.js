@@ -36,18 +36,24 @@ let inputSize = 512
 let scoreThreshold = 0.5
 
 let minConfidence = 0.5
+try{
   const result = await faceapi.detectAllFaces(tensor, new faceapi.SsdMobilenetv1Options({ minConfidence })).withFaceLandmarks().withFaceDescriptors()
   if (!faceMatcher) faceMatcher = new faceapi.FaceMatcher(result)
   
   const displaySize = {width: '100%', hegiht: '100%'}
 
-  const label = faceMatcher ? faceMatcher.findBestMatch(result[0].descriptor).toString():null
+  const label = faceMatcher && result ? faceMatcher.findBestMatch(result[0].descriptor).toString():null
   //const resizedResults = faceapi.resizeResults(result, displaySize)
-  const labelFormated = label.split(" ")
-  if(labelFormated[0] == 'person'){
-    return true
+  if(label){
+    const labelFormated = label.split(" ")
+    if(labelFormated[0] == 'person'){
+      return true
+    }
   }
   return false
+}catch(err){
+  return false
+}
 }
 
 async function main(file) {
