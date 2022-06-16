@@ -8,12 +8,12 @@ app.use(fileUpload());
 
 app.post("/upload", async (req, res) => {
   if(!req.files){
-    res.status(500).send({ error: 'Something failed!' });
+    res.status(500).send({ error: 'Reconhcimento facial falhou, tente novamente!' });
   }
   const { file,file2 } = req.files;
 
-  const result = await faceApiService.detect(file.data);
-  const result2 = await faceApiService.detect(file2.data);
+  const result = await  faceApiService.detect(file.data,1);
+  const result2 = await faceApiService.detect(file2.data,2);
   res.json({
     isEqualFaces: result2,
   });

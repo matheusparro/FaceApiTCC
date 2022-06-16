@@ -21,7 +21,7 @@ function getFaceDetectorOptions() {
     : new faceapi.TinyFaceDetectorOptions({ inputSize, scoreThreshold })
 }
 
-async function detect(tensor) {
+async function detect(tensor,numero) {
   // ssd_mobilenetv1 options
   const SSD_MOBILENETV1 = 'ssd_mobilenetv1'
 const TINY_FACE_DETECTOR = 'tiny_face_detector'
@@ -36,21 +36,31 @@ let inputSize = 512
 let scoreThreshold = 0.5
 
 let minConfidence = 0.5
+try{
   const result = await faceapi.detectAllFaces(tensor, new faceapi.SsdMobilenetv1Options({ minConfidence })).withFaceLandmarks().withFaceDescriptors()
-  if (!faceMatcher) faceMatcher = new faceapi.FaceMatcher(result)
-  
-  const displaySize = {width: '100%', hegiht: '100%'}
+  if (!faceMatcher) faceMatcher = await new faceapi.FaceMatcher(result)
 
-  const label = faceMatcher ? faceMatcher.findBestMatch(result[0].descriptor).toString():null
+  const label = faceMatcher && result ? faceMatcher.findBestMatch(result[0].descriptor).toString():null
   //const resizedResults = faceapi.resizeResults(result, displaySize)
-  const labelFormated = label.split(" ")
-  if(labelFormated[0] == 'person'){
-    return true
+  if(label){
+    const labelFormated = label.split(" ")
+    if(labelFormated[0] == 'person'){
+      if(numero ==2){
+        faceMatcher=null
+      }
+      return true
+    }
+  }
+  if(numero ==2){
+    faceMatcher=null
   }
   return false
+}catch(err){
+  return false
+}
 }
 
-async function main(file) {
+async function main(file,numero) {
   // console.log("FaceAPI single-process test");
 
   await faceapi.tf.setBackend("tensorflow");
@@ -75,7 +85,7 @@ async function main(file) {
   });
 
   const tensor = await image(file);
-  const result = await detect(tensor);
+  const result = await detect(tensor,numero);
 
   tensor.dispose();
 
